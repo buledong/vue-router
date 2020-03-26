@@ -15,6 +15,7 @@ import { AbstractHistory } from './history/abstract'
 
 import type { Matcher } from './create-matcher'
 
+// VueRouter 是一个class 也就是一个构造函数, 它上面有一个静态的install方法, 在Vue.use时会调用, 这个install函数最刚开始赋值为一个空函数, 在文件最后重新赋值了
 export default class VueRouter {
   static install: () => void;
   static version: string;
