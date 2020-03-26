@@ -12,4 +12,7 @@
 ```js
  git fetch upstream
 ```
-
+# 合并代码到本地仓库
+```js
+  git merge upstream/dev
+```
