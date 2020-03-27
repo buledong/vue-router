@@ -1,66 +1,42 @@
 /* @flow */
 
-import {
-  install
-} from './install'
-import {
-  START
-} from './util/route'
-import {
-  assert
-} from './util/warn'
-import {
-  inBrowser
-} from './util/dom'
-import {
-  cleanPath
-} from './util/path'
-import {
-  createMatcher
-} from './create-matcher'
-import {
-  normalizeLocation
-} from './util/location'
-import {
-  supportsPushState
-} from './util/push-state'
+import { install } from './install'
+import { START } from './util/route'
+import { assert } from './util/warn'
+import { inBrowser } from './util/dom'
+import { cleanPath } from './util/path'
+import { createMatcher } from './create-matcher'
+import { normalizeLocation } from './util/location'
+import { supportsPushState } from './util/push-state'
 
-import {
-  HashHistory
-} from './history/hash'
-import {
-  HTML5History
-} from './history/html5'
-import {
-  AbstractHistory
-} from './history/abstract'
+import { HashHistory } from './history/hash'
+import { HTML5History } from './history/html5'
+import { AbstractHistory } from './history/abstract'
 
-import type {
-  Matcher
-} from './create-matcher'
+import type { Matcher } from './create-matcher'
 
-// 引入VueRouter之后, 会做三件事, 
+// 引入VueRouter之后, 会做三件事,
 // 首先 Vue.use(VueRouter)  // 安装插件, 就是调用了VueRouter.install方法
 // 然后 new VueRouter() 得到router // 调用VueRouter的构造函数
 // 把得到的router传入new Vue
 
 // VueRouter 是一个class 也就是一个构造函数, 它上面有一个静态的install方法, 在Vue.use时会调用, 这个install函数最刚开始赋值为一个空函数, 在文件最后重新赋值了
 export default class VueRouter {
-  static install: () => void;
-  static version: string;
+  static install: () => void
+  static version: string
 
-  app: any;
-  apps: Array < any > ;
-  ready: boolean;
-  readyCbs: Array < Function > ;
-  options: RouterOptions;
-  mode: string;
-  history: HashHistory | HTML5History | AbstractHistory;
-  matcher: Matcher;
-  fallback: boolean;
-  beforeHooks: Array < ? NavigationGuard > ;
-  resolveHooks: Array < ? NavigationGuard > ;
-  afterHooks: Array < ? AfterNavigationHook > ;
+  app: any
+  apps: Array<any>
+  ready: boolean
+  readyCbs: Array<Function>
+  options: RouterOptions
+  mode: string
+  history: HashHistory | HTML5History | AbstractHistory
+  matcher: Matcher
+  fallback: boolean
+  beforeHooks: Array<?NavigationGuard>
+  resolveHooks: Array<?NavigationGuard>
+  afterHooks: Array<?AfterNavigationHook>
 
   // 在new VueRouter时调用
   constructor(options: RouterOptions = {}) {
@@ -73,7 +49,8 @@ export default class VueRouter {
     this.matcher = createMatcher(options.routes || [], this)
 
     let mode = options.mode || 'hash'
-    this.fallback = mode === 'history' && !supportsPushState && options.fallback !== false
+    this.fallback =
+      mode === 'history' && !supportsPushState && options.fallback !== false
     if (this.fallback) {
       mode = 'hash'
     }
@@ -99,24 +76,21 @@ export default class VueRouter {
     }
   }
 
-  match(
-    raw: RawLocation,
-    current ? : Route,
-    redirectedFrom ? : Location
-  ): Route {
+  match(raw: RawLocation, current?: Route, redirectedFrom?: Location): Route {
     return this.matcher.match(raw, current, redirectedFrom)
   }
 
-  get currentRoute(): ? Route {
+  get currentRoute(): ?Route {
     return this.history && this.history.current
   }
 
-  init(app: any /* Vue component instance */ ) {
-    process.env.NODE_ENV !== 'production' && assert(
-      install.installed,
-      `not installed. Make sure to call \`Vue.use(VueRouter)\` ` +
-      `before creating root instance.`
-    )
+  init(app: any /* Vue component instance */) {
+    process.env.NODE_ENV !== 'production' &&
+      assert(
+        install.installed,
+        `not installed. Make sure to call \`Vue.use(VueRouter)\` ` +
+          `before creating root instance.`
+      )
 
     this.apps.push(app)
 
@@ -155,7 +129,7 @@ export default class VueRouter {
     }
 
     history.listen(route => {
-      this.apps.forEach((app) => {
+      this.apps.forEach(app => {
         app._route = route
       })
     })
@@ -173,7 +147,7 @@ export default class VueRouter {
     return registerHook(this.afterHooks, fn)
   }
 
-  onReady(cb: Function, errorCb ? : Function) {
+  onReady(cb: Function, errorCb?: Function) {
     this.history.onReady(cb, errorCb)
   }
 
@@ -181,7 +155,7 @@ export default class VueRouter {
     this.history.onError(errorCb)
   }
 
-  push(location: RawLocation, onComplete ? : Function, onAbort ? : Function) {
+  push(location: RawLocation, onComplete?: Function, onAbort?: Function) {
     // $flow-disable-line
     if (!onComplete && !onAbort && typeof Promise !== 'undefined') {
       return new Promise((resolve, reject) => {
@@ -192,7 +166,7 @@ export default class VueRouter {
     }
   }
 
-  replace(location: RawLocation, onComplete ? : Function, onAbort ? : Function) {
+  replace(location: RawLocation, onComplete?: Function, onAbort?: Function) {
     // $flow-disable-line
     if (!onComplete && !onAbort && typeof Promise !== 'undefined') {
       return new Promise((resolve, reject) => {
@@ -215,25 +189,29 @@ export default class VueRouter {
     this.go(1)
   }
 
-  getMatchedComponents(to ? : RawLocation | Route): Array < any > {
-    const route: any = to ?
-      to.matched ?
-      to :
-      this.resolve(to).route : this.currentRoute
+  getMatchedComponents(to?: RawLocation | Route): Array<any> {
+    const route: any = to
+      ? to.matched
+        ? to
+        : this.resolve(to).route
+      : this.currentRoute
     if (!route) {
       return []
     }
-    return [].concat.apply([], route.matched.map(m => {
-      return Object.keys(m.components).map(key => {
-        return m.components[key]
+    return [].concat.apply(
+      [],
+      route.matched.map(m => {
+        return Object.keys(m.components).map(key => {
+          return m.components[key]
+        })
       })
-    }))
+    )
   }
 
   resolve(
     to: RawLocation,
-    current ? : Route,
-    append ? : boolean
+    current?: Route,
+    append?: boolean
   ): {
     location: Location,
     route: Route,
@@ -243,12 +221,7 @@ export default class VueRouter {
     resolved: Route
   } {
     current = current || this.history.current
-    const location = normalizeLocation(
-      to,
-      current,
-      append,
-      this
-    )
+    const location = normalizeLocation(to, current, append, this)
     const route = this.match(location, current)
     const fullPath = route.redirectedFrom || route.fullPath
     const base = this.history.base
@@ -263,7 +236,7 @@ export default class VueRouter {
     }
   }
 
-  addRoutes(routes: Array < RouteConfig > ) {
+  addRoutes(routes: Array<RouteConfig>) {
     this.matcher.addRoutes(routes)
     if (this.history.current !== START) {
       this.history.transitionTo(this.history.getCurrentLocation())
@@ -271,7 +244,7 @@ export default class VueRouter {
   }
 }
 
-function registerHook(list: Array < any > , fn: Function): Function {
+function registerHook(list: Array<any>, fn: Function): Function {
   list.push(fn)
   return () => {
     const i = list.indexOf(fn)
